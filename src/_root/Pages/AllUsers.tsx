@@ -1,30 +1,49 @@
 import Loader from "@/components/shared/Loader";
 import { useGetUsers } from "@/lib/react-query/queriesAndMutation";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
-import People from "@/components/shared/People";
+import React, { useEffect } from "react";
+import { useUserContext } from "@/context/AuthContext";
+import UserCard from "@/components/shared/UserCard";
+
 const AllUsers = () => {
   const { data: users, fetchNextPage, hasNextPage } = useGetUsers();
   const { ref, inView } = useInView();
+  const { user: currentUser } = useUserContext();
+
   useEffect(() => {
     if (inView) {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
-  // console.log(users);
 
   return (
-    <div>
-      <div>
-        {users?.pages.map((user, index) => {
-          return <People user={user?.documents} key={index} />;
-        })}
+    <div className="mx-auto">
+      <div className="flex pt-16 lg:pl-8 gap-2 justify-start">
+        <img src="/assets/icons/people.svg" width={30} height={30} className="text-white" alt="people" />
+        <h1 className="h3-bold md:h1-bold ">All Users</h1>
       </div>
-      {hasNextPage ? (
+
+      <ul className="grid grid-cols-1 lg:grid-cols-4 p-12 gap-4 lg:gap-8 justify-center">
+        {users?.pages.map((page, pageIndex) => (
+          <React.Fragment key={pageIndex}>
+            {page?.documents
+              .filter((user) => {
+                return user.$id !== currentUser.id;
+              })
+              .map((user) => (
+                <li key={user?.$id}>
+                  <UserCard user={user} action={'All User'} />
+                </li>
+              ))}
+          </React.Fragment>
+        ))}
+      </ul>
+
+      {hasNextPage && (
         <div ref={ref}>
           <Loader />
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

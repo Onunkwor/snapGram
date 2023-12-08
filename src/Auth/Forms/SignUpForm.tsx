@@ -168,7 +168,7 @@ const SignUpForm = () => {
             {isCreatingAccount || isSigningInUser || isUserLoading ? (
               <div className="flex-center">
                 <Loader />
-                Loading...
+                 Loading...
               </div>
             ) : (
               "Sign Up"

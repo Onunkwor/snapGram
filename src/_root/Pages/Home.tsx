@@ -1,15 +1,25 @@
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
 import RightSideBar from "@/components/shared/RightSideBar";
-import { useGetRecentPosts } from "@/lib/react-query/queriesAndMutation";
+import { useGetPosts } from "@/lib/react-query/queriesAndMutation";
 import { Models } from "appwrite";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 const Home = () => {
   const {
     data: posts,
+    fetchNextPage,
+    hasNextPage,
     isPending: isPostLoading,
-    // isError: isErrorPost,
-  } = useGetRecentPosts();
+  } = useGetPosts();
+
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView]);
 
   return (
     <div className="flex flex-1">
@@ -20,7 +30,7 @@ const Home = () => {
             <Loader />
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">
-              {posts?.documents.map((post: Models.Document, i) => (
+              {posts?.pages[0]?.documents.map((post: Models.Document, i) => (
                 <li key={i}>
                   <PostCard post={post} />
                 </li>
@@ -28,8 +38,13 @@ const Home = () => {
             </ul>
           )}
         </div>
+        {hasNextPage && (
+          <div ref={ref}>
+            <Loader />
+          </div>
+        )}
       </div>
-      <div className="w-465 h-[1024] hidden lg:block">
+      <div className="w-465 h-[1024] hidden lg:block overflow-x-hidden overflow-y-scroll custom-scrollbar">
         <RightSideBar />
       </div>
     </div>
