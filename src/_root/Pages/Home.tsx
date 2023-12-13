@@ -14,6 +14,8 @@ const Home = () => {
     isPending: isPostLoading,
   } = useGetPosts();
 
+  console.log(posts);
+  
   const { ref, inView } = useInView();
   useEffect(() => {
     if (inView) {

@@ -87,8 +87,7 @@ export async function getCurrentUser() {
     const currentAccount = await getAccount();
 
     if (!currentAccount) throw Error("No current account");
-     console.log(currentAccount);
-     
+
     const currentUser = await databases.listDocuments(
       appWriteConfig.databaseId,
       appWriteConfig.userCollectionId,
@@ -571,5 +570,72 @@ export async function getInfiniteUsers({
     return users;
   } catch (error) {
     console.log("Error getting users", error);
+  }
+}
+
+// ===================================== Profile
+
+// export async function updateProfile(user: IUpdateUser) {
+//   const hasImageToUpdate = user.file.length > 0;
+//   try {
+//     let image = {
+//       imageUrl: user.imageUrl,
+//       imageId: user.imageId,
+//     };
+
+//     if (hasImageToUpdate) {
+//       const uploadedImage = await uploadFile(user.file[0]);
+//       if (uploadedImage) throw Error;
+//       const fileUrl = getFilePreview(uploadedImage.$id);
+//       if (!fileUrl) {
+//         await deleteFile(uploadedImage.$id);
+//         throw Error;
+//       }
+//       image = { ...image, imageUrl: fileUrl, imageId: uploadedImage.$id };
+//     }
+
+//     const updatedUser = await databases.updateDocument(
+//       appWriteConfig.databaseId,
+//       appWriteConfig.userCollectionId,
+//       user.userId,
+//       {
+//         name: user.name,
+//         bio: user.bio,
+//         imageUrl: image.imageUrl,
+//         imageId: image.imageId,
+//       }
+//     );
+
+//     // Failed to update
+//     if (!updatedUser) {
+//       // Delete new file that has been recently uploaded
+//       if (hasImageToUpdate) {
+//         await deleteFile(image.imageId);
+//       }
+//       // If no new file uploaded, just throw error
+//       throw Error;
+//     }
+
+//     // Safely delete old file after successful update
+//     if (user.imageId && hasImageToUpdate) {
+//       await deleteFile(user.imageId);
+//     }
+
+//     return updatedUser;
+//   } catch (error) {
+//     console.log("Error Updating Profile", error);
+//   }
+// }
+
+export async function updateProfileImage(file: File) {
+  try {
+    const updateImage = await storage.createFile(
+      appWriteConfig.storageId,
+      ID.unique(),
+      file
+    );
+    return updateImage;
+  } catch (error) {
+    console.log("Error Updating ProfileImage", error);
   }
 }

@@ -20,8 +20,9 @@ import {
   signInAccount,
   signOutAccount,
   updatePost,
+  updateUser,
 } from "../Appwrite/api";
-import { INewPost, INewUser, IUpdatePost } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { QUERY_KEYS } from "./querieKey";
 
 // ============================================================
@@ -213,4 +214,16 @@ export const useGetUsers = () => {
     },
     initialPageParam: null,
    })
+}
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (user: IUpdateUser) => updateUser(user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER]
+      })
+    }
+  })
 }

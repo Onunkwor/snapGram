@@ -55,3 +55,25 @@ export type INewUser = {
   username: string;
   password: string;
 };
+ export type ICurrentUser = {
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    $permissions: any[];
+    $updatedAt: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Liked?: any[];
+    accountID?: string;
+    bio?: string | null;
+    email?: string;
+    imageId?: string | null;
+    imageUrl?: string;
+    name?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    posts?: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    save?: any[];
+    userName?: string;
+ }
