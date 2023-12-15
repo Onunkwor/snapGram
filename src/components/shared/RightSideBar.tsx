@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import { useUserContext } from "@/context/AuthContext";
 
 const RightSideBar = () => {
-  const { data: users, fetchNextPage, hasNextPage } = useGetUsers();
+  const { data: users, fetchNextPage, hasNextPage, isPending } = useGetUsers();
   const { ref, inView } = useInView();
   const { user: currentUser } = useUserContext();
   // console.log(currentUser);
@@ -16,6 +16,11 @@ const RightSideBar = () => {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
+  if(isPending){
+    return (<div className="flex-center w-full justify-center items-center h-full">
+      <Loader />
+    </div>)
+  }
 
   return (
     <div>
@@ -38,7 +43,7 @@ const RightSideBar = () => {
       </ul>
 
       {hasNextPage ? (
-        <div ref={ref}>
+        <div ref={ref} className="flex-center">
           <Loader />
         </div>
       ) : null}

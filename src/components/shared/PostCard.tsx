@@ -9,7 +9,7 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
-
+  
   if (!post.creator) return;
 
   const formatDateDistance = (dateString: string) => {

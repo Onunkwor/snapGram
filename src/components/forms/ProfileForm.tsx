@@ -23,6 +23,7 @@ import {
 } from "@/lib/react-query/queriesAndMutation";
 import { toast } from "../ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
+import { ToastAction } from "../ui/toast";
 
 const ProfileForm = () => {
   const { data: user } = useGetCurrentUser();
@@ -55,10 +56,14 @@ const ProfileForm = () => {
       imageUrl: user.imageUrl || "",
       imageId: user.imageId || "",
     });
-
+    
     if (!updatedUser) {
       toast({
+        variant: "destructive",
         title: `Update user failed. Please try again.`,
+        description: "There was a problem Signing in.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        className: "shad-form_ErrorMessage",
       });
     }
 
@@ -74,7 +79,8 @@ const ProfileForm = () => {
   const handelCancelPost = () => {
     navigate(`/profile/${user.$id}`);
   };
-
+console.log(user);
+  
   return (
     <Form {...form}>
       <form

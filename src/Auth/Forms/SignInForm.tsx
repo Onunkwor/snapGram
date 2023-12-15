@@ -118,7 +118,7 @@ const SignInForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="shad-button_primary">
+          <Button type="submit" className="shad-button_primary" disabled={isUserLoading}>
             {isPending ? (
               <div className="flex-center gap-2">
                 <Loader />
