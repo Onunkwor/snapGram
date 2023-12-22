@@ -276,7 +276,7 @@ export async function searchPosts(searchTerm: string) {
     const posts = await databases.listDocuments(
       appWriteConfig.databaseId,
       appWriteConfig.postCollectionId,
-      [Query.search("Caption", searchTerm)]
+      [Query.search("caption", searchTerm)]
     );
 
     if (!posts) throw Error;
@@ -307,7 +307,13 @@ export async function getPostById(postId?: string) {
 }
 
 // ============================== DELETE POST
-export async function deletePost(postId?: string, imageId?: string) {
+export async function deletePost({
+  postId,
+  imageId,
+}: {
+  postId: string;
+  imageId: string;
+}) {
   if (!postId || !imageId) return;
 
   try {
@@ -367,6 +373,57 @@ export async function savePost(userId: string, postId: string) {
     console.log(error);
   }
 }
+
+export async function followingUser(
+  userName: string,
+  userId: string,
+  loggedInUserId: string,
+  loggedInUserName: string
+) {
+  try {
+    const followingUser = await databases.createDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.followingsCollectionId,
+      ID.unique(),
+      {
+        userName: userName,
+        user: loggedInUserId,
+        userId: userId,
+      }
+    );
+    userFollowers(userId, loggedInUserName, loggedInUserId);
+    if (!followingUser) throw new Error();
+    return followingUser; // Return relevant information
+  } catch (error) {
+    console.error("Error following user:", error);
+    throw error; // Re-throw the error to maintain consistency
+  }
+}
+
+export async function userFollowers(
+  userId: string,
+  loggedInUserName: string,
+  loggedInUserId: string
+) {
+  try {
+    // Add the logged-in user to the followers array of the user being followed
+    const followerResponse = await databases.createDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.followersCollectionId,
+      ID.unique(),
+      {
+        user: userId,
+        userName: loggedInUserName,
+        userId: loggedInUserId,
+      }
+    );
+    if (!followerResponse) throw new Error();
+    return followerResponse;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // ============================== DELETE SAVED POST
 export async function deleteSavedPost(savedRecordId: string) {
   try {
@@ -383,7 +440,39 @@ export async function deleteSavedPost(savedRecordId: string) {
     console.log("Error deleting post", error);
   }
 }
-
+ // ================================ Delete following 
+export async function deleteFollowing (followingRecordId: string, followerRecordId: string){ 
+  try{
+    console.log(followerRecordId,followingRecordId);
+    
+    const statusCode = await databases.deleteDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.followingsCollectionId,
+      followingRecordId
+    )
+     await deleteFollower(followerRecordId)
+    if(!statusCode) throw ("Error deleting following record")
+    return {status: 'Ok'}
+  } catch(error) {
+    console.log(error);
+    
+  }
+}
+// ================================== Delete follower 
+export async function deleteFollower (followerRecordId: string){
+  try{
+    const statusCode = await databases.deleteDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.followersCollectionId,
+      followerRecordId
+    )
+    if(!statusCode) throw ("Error deleting follower record")
+    return {status: 'Ok'}
+  } catch(error) {
+    console.log(error);
+    
+  }
+}
 // ============================== GET USER'S POST
 export async function getUserPosts(userId?: string) {
   if (!userId) return;
@@ -422,6 +511,25 @@ export async function getUserLikedPosts(postIds: []) {
   }
 }
 
+//======================================== Get User Saved Posts
+export async function getUserSavedPosts(postIds: []) {
+  try {
+    const posts = [];
+
+    for (const postId of postIds) {
+      const post = await databases.getDocument(
+        appWriteConfig.databaseId,
+        appWriteConfig.postCollectionId,
+        postId
+      );
+      posts.push(post);
+    }
+
+    return posts;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 // ============================== GET POPULAR POSTS (BY HIGHEST LIKE COUNT)
 export async function getRecentPosts() {
@@ -575,8 +683,15 @@ export async function getInfiniteUsers({
 }: {
   pageParam: string | null;
 }) {
+  const currentAccount = await getAccount();
+  if (!currentAccount) throw Error("No current account");
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const queries: any[] = [Query.orderDesc("$createdAt"), Query.limit(20)];
+  const queries: any[] = [
+    Query.orderDesc("$createdAt"),
+    Query.limit(20),
+    Query.notEqual("accountID", currentAccount.$id),
+  ];
   if (pageParam) {
     queries.push(Query.cursorAfter(pageParam));
   }

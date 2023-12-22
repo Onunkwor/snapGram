@@ -8,12 +8,15 @@ export const appWriteConfig = {
   userCollectionId: import.meta.env.VITE_APPWRITE_USER_COLLECTIONS_ID,
   postCollectionId: import.meta.env.VITE_APPWRITE_POST_COLLECTIONS_ID,
   savesCollectionId: import.meta.env.VITE_APPWRITE_SAVES_COLLECTIONS_ID,
+  followersCollectionId: import.meta.env.VITE_APPWRITE_FOLLOWERS_COLLECTIONS_ID,
+  followingsCollectionId: import.meta.env.VITE_APPWRITE_FOLLOWINGS_COLLECTIONS_ID
 };
 
 export const client = new Client();
 
 client.setEndpoint(appWriteConfig.url);
 client.setProject(appWriteConfig.projectId);
+
 
 export const account = new Account(client);
 export const databases = new Databases(client);

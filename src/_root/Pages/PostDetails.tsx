@@ -2,14 +2,19 @@ import Loader from "@/components/shared/Loader";
 import PostStats from "@/components/shared/PostStats";
 import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetPostById } from "@/lib/react-query/queriesAndMutation";
+import {
+  useDeletePost,
+  useGetPostById,
+} from "@/lib/react-query/queriesAndMutation";
 import { formatDistanceToNow } from "date-fns";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const PostDetails = () => {
   const { id } = useParams();
-  const { data: post, isPending } = useGetPostById(id!);
+  const { data: post, isPending } = useGetPostById(id || '');
   const { user } = useUserContext();
+  const { mutate: deletePost, isPending: isDeletingPost } = useDeletePost();
+  const navigate = useNavigate();
   const formatDateDistance = (dateString: string | undefined) => {
     if (dateString === undefined) {
       return "";
@@ -20,10 +25,15 @@ const PostDetails = () => {
   };
 
   // console.log(post);
-  console.log(user);
+  // console.log(user);
 
   const formattedDate = formatDateDistance(post?.$createdAt);
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    if(!post || !id) return;
+    deletePost({postId: id, imageId: post.imageId});
+     
+    navigate("/");
+  };
   return (
     <div className="post_details-container">
       {isPending ? (
@@ -81,12 +91,17 @@ const PostDetails = () => {
                     user.id !== post?.creator.$id && "hidden"
                   } `}
                 >
-                  <img
-                    src="/assets/icons/delete.svg"
-                    alt="delete"
-                    width={24}
-                    height={24}
-                  />
+                  {" "}
+                  {isDeletingPost ? (
+                    <Loader />
+                  ) : (
+                    <img
+                      src="/assets/icons/delete.svg"
+                      alt="delete"
+                      width={24}
+                      height={24}
+                    />
+                  )}
                 </Button>
               </div>
             </div>

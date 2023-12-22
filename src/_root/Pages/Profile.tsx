@@ -22,7 +22,6 @@ const Profile = () => {
 
   const{data} = useGetUserLikedPosts(likedPostsIds)
  console.log(data);
-    // console.log(likedPostsIds);
     
   const {
     data: user,

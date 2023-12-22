@@ -7,8 +7,10 @@ import {
 import {
   createPost,
   createUserAccount,
+  deleteFollowing,
   deletePost,
   deleteSavedPost,
+  followingUser,
   getCurrentUser,
   getInfinitePosts,
   getInfiniteUsers,
@@ -17,6 +19,7 @@ import {
   getUserById,
   getUserLikedPosts,
   getUserPosts,
+  getUserSavedPosts,
   likePost,
   savePost,
   searchPosts,
@@ -61,6 +64,9 @@ export const useCreatePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+      });
     },
   });
 };
@@ -97,8 +103,8 @@ export const useLikePost = () => {
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_USER_POSTS]
-      })
+        queryKey: [QUERY_KEYS.GET_USER_POSTS],
+      });
     },
   });
 };
@@ -106,8 +112,8 @@ export const useDeletePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, userId }: { postId: string; userId: string }) =>
-      deletePost(postId, userId),
+    mutationFn: ({ postId, imageId }: { postId: string; imageId: string }) =>
+      deletePost({ postId, imageId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
@@ -118,14 +124,18 @@ export const useDeletePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+      });
     },
   });
 };
+
 export const useSavePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, postId }: { userId: string; postId: string}) =>
+    mutationFn: ({ userId, postId }: { userId: string; postId: string }) =>
       savePost(userId, postId),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -140,6 +150,7 @@ export const useSavePost = () => {
     },
   });
 };
+
 export const useDeleteSavedPost = () => {
   const queryClient = useQueryClient();
 
@@ -186,19 +197,19 @@ export const useGetPosts = () => {
     getNextPageParam: (lastPage) => {
       if (lastPage && lastPage.documents.length === 0) return null;
       const lastId = lastPage?.documents[lastPage?.documents.length - 1].$id;
-      return lastId || null; 
+      return lastId || null;
     },
-    initialPageParam: null, 
+    initialPageParam: null,
   });
 };
 
-export const useSearchPosts =(searchTerm: string) => {
+export const useSearchPosts = (searchTerm: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
     queryFn: () => searchPosts(searchTerm),
-    enabled: !!searchTerm
-  })
-}
+    enabled: !!searchTerm,
+  });
+};
 // ============================================================
 // USER QUERIES
 // ============================================================
@@ -210,17 +221,17 @@ export const useGetCurrentUser = () => {
 };
 
 export const useGetUsers = () => {
-   return useInfiniteQuery({
+  return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_USERS],
     queryFn: getInfiniteUsers,
-    getNextPageParam: (lastPage)=> {
-     if(lastPage && lastPage.documents.length === 0) return null;
-     const lastId = lastPage?.documents[lastPage?.documents.length - 1].$id;
-     return lastId || null;
+    getNextPageParam: (lastPage) => {
+      if (lastPage && lastPage.documents.length === 0) return null;
+      const lastId = lastPage?.documents[lastPage?.documents.length - 1].$id;
+      return lastId || null;
     },
     initialPageParam: null,
-   })
-}
+  });
+};
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
@@ -228,30 +239,81 @@ export const useUpdateUser = () => {
     mutationFn: (user: IUpdateUser) => updateUser(user),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CURRENT_USER]
-      })
-    }
-  })
-}
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+    },
+  });
+};
 
 export const useGetUserById = (userId: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
     queryFn: () => getUserById(userId),
-  })
-}
+  });
+};
 
-export const useGetUserPosts = (userId?: string) =>{
+export const useGetUserPosts = (userId?: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.GET_USER_POSTS,userId],
+    queryKey: [QUERY_KEYS.GET_USER_POSTS, userId],
     queryFn: () => getUserPosts(userId),
-    enabled: !!userId
-  })
-}
-export const useGetUserLikedPosts = (userId: []) =>{
+    enabled: !!userId,
+  });
+};
+export const useGetUserLikedPosts = (userId: []) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.GET_USER_LIKES,userId],
+    queryKey: [QUERY_KEYS.GET_USER_LIKES, userId],
     queryFn: () => getUserLikedPosts(userId),
-    enabled: !!userId
-  })
-}
+    enabled: !!userId,
+  });
+};
+export const useGetUserSavedPosts = (userId: []) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_SAVED, userId],
+    queryFn: () => getUserSavedPosts(userId),
+    enabled: !!userId,
+  });
+};
+export const useFollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userName,
+      userId,
+      loggedInUserId,
+      loggedInUserName,
+    }: {
+      userName: string;
+      userId: string;
+      loggedInUserId: string;
+      loggedInUserName: string;
+    }) => followingUser(userName, userId, loggedInUserId, loggedInUserName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_INFINITE_USERS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+    },
+  });
+};
+export const useDeleteFollowing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      followingRecordId,
+      followerRecordId,
+    }: {
+      followingRecordId: string;
+      followerRecordId: string;
+    }) => deleteFollowing(followingRecordId, followerRecordId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_INFINITE_USERS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+    },
+  });
+};
