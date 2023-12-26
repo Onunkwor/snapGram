@@ -7,12 +7,9 @@ type FileUploaderProps = {
   mediaUrl: string;
 };
 const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
-  // const [file, setFile] = useState<File[]>([]);
   const [fileUrl, setFileUrl] = useState(mediaUrl);
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
-      // Do something with the files
-      // setFile(acceptedFiles);
       fieldChange(acceptedFiles);
       setFileUrl(URL.createObjectURL(acceptedFiles[0]));
     },

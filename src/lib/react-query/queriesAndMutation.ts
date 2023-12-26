@@ -5,6 +5,7 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import {
+  addComment,
   createPost,
   createUserAccount,
   deleteFollowing,
@@ -20,6 +21,7 @@ import {
   getUserLikedPosts,
   getUserPosts,
   getUserSavedPosts,
+  likeComment,
   likePost,
   savePost,
   searchPosts,
@@ -66,6 +68,12 @@ export const useCreatePost = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_POST_BY_ID],
       });
     },
   });
@@ -126,6 +134,12 @@ export const useDeletePost = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_POST_BY_ID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
       });
     },
   });
@@ -210,6 +224,59 @@ export const useSearchPosts = (searchTerm: string) => {
     enabled: !!searchTerm,
   });
 };
+export const useAddComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      postId,
+      userName,
+      comment,
+      userImage
+    }: {
+      postId: string;
+      userName: string;
+      comment: string;
+      userImage: URL
+    }) => addComment(postId, userName, comment,userImage),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_POSTS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_POST_BY_ID],
+      });
+    },
+  });
+};
+export const useLikeComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+   mutationFn: ({commentId, userId}:{commentId: string, userId: string[]}) => likeComment(commentId, userId),
+   onSuccess: (data) => {
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.post.$id],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.GET_POSTS],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.GET_USER_POSTS],
+    });
+  },
+  })
+}
 // ============================================================
 // USER QUERIES
 // ============================================================
@@ -294,6 +361,12 @@ export const useFollowUser = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USERS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
+      });
     },
   });
 };
@@ -313,6 +386,12 @@ export const useDeleteFollowing = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USERS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
       });
     },
   });

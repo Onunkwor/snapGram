@@ -71,7 +71,6 @@
   .tiny-medium {
     @apply text-[10px] font-medium leading-[140%];
   }
-  
 
   /* UTILITIES */
   .invert-white {
@@ -285,4 +284,26 @@
   .shad-button_ghost {
     @apply flex gap-4 items-center justify-start hover:bg-transparent hover:text-white !important;
   }
+}
+
+.btn-gradient-1 {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(to right, #3121ff 0%, #877eff 50%, #685dff 100%);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-gradient-1 img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.no-scrollbar::-webkit-scrollbar { 
+  display: none; 
 }

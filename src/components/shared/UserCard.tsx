@@ -8,6 +8,7 @@ import Loader from "./Loader";
 import { Models } from "appwrite";
 import { IFollowing } from "@/types";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type UserProps = {
   user: Models.Document;
@@ -53,6 +54,7 @@ const UserCard = ({ user, action }: UserProps) => {
           followingRecordId: followingIdToDelete,
           followerRecordId: followerIdToDelete,
         });
+        setIsFollowing(false)
       }
     } else {
       if (!user.userName || !currentUser) {
@@ -65,11 +67,13 @@ const UserCard = ({ user, action }: UserProps) => {
         loggedInUserId: currentUser.$id,
         loggedInUserName: currentUser.userName,
       });
+      setIsFollowing(true)
     }
   };
   
 
   return (
+    <Link to={`/profile/${user.$id}`}>  
     <div
       className={`w-48 h-48 border flex flex-col justify-center p-10 gap-2 items-center rounded-3xl ${
         action === "All User" ? "border-[#101012]" : "border-white"
@@ -93,6 +97,7 @@ const UserCard = ({ user, action }: UserProps) => {
         )}
       </Button>
     </div>
+    </Link>
   );
 };
 

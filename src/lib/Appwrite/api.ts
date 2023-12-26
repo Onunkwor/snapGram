@@ -391,7 +391,7 @@ export async function followingUser(
         userId: userId,
       }
     );
-    userFollowers(userId, loggedInUserName, loggedInUserId);
+    await userFollowers(userId, loggedInUserName, loggedInUserId);
     if (!followingUser) throw new Error();
     return followingUser; // Return relevant information
   } catch (error) {
@@ -440,37 +440,38 @@ export async function deleteSavedPost(savedRecordId: string) {
     console.log("Error deleting post", error);
   }
 }
- // ================================ Delete following 
-export async function deleteFollowing (followingRecordId: string, followerRecordId: string){ 
-  try{
-    console.log(followerRecordId,followingRecordId);
-    
+// ================================ Delete following
+export async function deleteFollowing(
+  followingRecordId: string,
+  followerRecordId: string
+) {
+  try {
+    // console.log(followerRecordId,followingRecordId);
+
     const statusCode = await databases.deleteDocument(
       appWriteConfig.databaseId,
       appWriteConfig.followingsCollectionId,
       followingRecordId
-    )
-     await deleteFollower(followerRecordId)
-    if(!statusCode) throw ("Error deleting following record")
-    return {status: 'Ok'}
-  } catch(error) {
+    );
+    await deleteFollower(followerRecordId);
+    if (!statusCode) throw "Error deleting following record";
+    return { status: "Ok" };
+  } catch (error) {
     console.log(error);
-    
   }
 }
-// ================================== Delete follower 
-export async function deleteFollower (followerRecordId: string){
-  try{
+// ================================== Delete follower
+export async function deleteFollower(followerRecordId: string) {
+  try {
     const statusCode = await databases.deleteDocument(
       appWriteConfig.databaseId,
       appWriteConfig.followersCollectionId,
       followerRecordId
-    )
-    if(!statusCode) throw ("Error deleting follower record")
-    return {status: 'Ok'}
-  } catch(error) {
+    );
+    if (!statusCode) throw "Error deleting follower record";
+    return { status: "Ok" };
+  } catch (error) {
     console.log(error);
-    
   }
 }
 // ============================== GET USER'S POST
@@ -705,5 +706,49 @@ export async function getInfiniteUsers({
     return users;
   } catch (error) {
     console.log("Error getting users", error);
+  }
+}
+// =============================== Add comments
+export async function addComment(
+  postId: string,
+  userName: string,
+  comment: string,
+  userImage: URL
+) {
+  try {
+    const comments = await databases.createDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.commentsCollectionId,
+      ID.unique(),
+      {
+        post: postId,
+        userName,
+        comment,
+        userImage
+      }
+    );
+    if (!comments) throw new Error();
+    return comments;
+  } catch (error) {
+    console.log("Error adding comment", error);
+  }
+}
+
+export async function likeComment(commentId: string, userId: string[]) {
+  try {
+    const commentLikes = await databases.updateDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.commentsCollectionId,
+      commentId,
+      {
+        likes: userId,
+      }
+    );
+
+    if (!commentLikes) throw new Error("Update failed");
+    
+    return commentLikes;
+  } catch (error) {
+    console.error("Error liking comment", error);
   }
 }

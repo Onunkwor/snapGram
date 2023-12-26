@@ -3,35 +3,91 @@ import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
 import { Button } from "@/components/ui/button";
 import {
+  useDeleteFollowing,
+  useFollowUser,
   useGetCurrentUser,
   useGetUserById,
   useGetUserLikedPosts,
   useGetUserPosts,
 } from "@/lib/react-query/queriesAndMutation";
+import { IFollowing } from "@/types";
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const Profile = () => {
   const { id } = useParams();
-
   const { data: currentUser } = useGetCurrentUser();
   const [activeTab, setActiveTab] = useState("posts");
   const { data: userPosts } = useGetUserPosts(id);
-  const likedPostsIds = currentUser?.Liked.map((post: Models.Document) => post.$id )
-
-  const{data} = useGetUserLikedPosts(likedPostsIds)
- console.log(data);
-    
+  const likedPostsIds = currentUser?.liked.map(
+    (post: Models.Document) => post.$id
+  );
+  const { data } = useGetUserLikedPosts(likedPostsIds);
   const {
     data: user,
     isPending: isUserLoading,
     refetch,
   } = useGetUserById(id || "");
-
   useEffect(() => {
     refetch();
   }, [id]);
+  const isCurrentUser = currentUser?.$id === user?.$id;
+
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  useEffect(() => {
+    setIsFollowing(
+      user &&
+        user.followers.some((user: IFollowing) => {
+          return user.userId === currentUser?.$id;
+        })
+    );
+  }, [currentUser, user]);
+  // console.log(currentUser);
+  
+  const { mutate: followUser, isPending: isFollowingLoading } = useFollowUser();
+  const { mutate: deleteFollowing, isPending: isDeletingFollowing } =
+    useDeleteFollowing();
+  const followersList = user?.followers?.map(
+    (follower: Models.Document) => follower.userId
+  );
+  const handleFollowUser = () => {
+    const newFollowing = [...followersList];
+    const isCurrentUserDefined = currentUser && currentUser.$id;
+    const alreadyFollowing = newFollowing.includes(currentUser?.$id);
+
+    if (alreadyFollowing && isCurrentUserDefined) {
+      const followingIndex = currentUser.following.findIndex(
+        (follower: Models.Document) => follower.userId === user?.$id
+      );
+      const followerIndex = user?.followers.findIndex(
+        (follower: Models.Document) => follower.userId === currentUser?.$id
+      );
+
+      if (followerIndex !== -1 && followingIndex !== -1) {
+        const followerIdToDelete = user?.followers[followerIndex].$id;
+        const followingIdToDelete = currentUser.following[followingIndex].$id;
+
+        deleteFollowing({
+          followingRecordId: followingIdToDelete,
+          followerRecordId: followerIdToDelete,
+        });
+        setIsFollowing(false);
+      }
+    } else {
+      if (!user?.userName || !currentUser) {
+        throw new Error("User does not have a userName");
+      }
+
+      followUser({
+        userName: user.userName,
+        userId: user.$id,
+        loggedInUserId: currentUser.$id,
+        loggedInUserName: currentUser.userName,
+      });
+      setIsFollowing(true);
+    }
+  };
 
   if (isUserLoading) {
     return (
@@ -40,10 +96,8 @@ const Profile = () => {
       </div>
     );
   }
-  const isCurrentUser = currentUser?.$id === user?.$id;
-
   return (
-    <div className="overflow-scroll custom-scrollbar mx-auto">
+    <div className="overflow-scroll custom-scrollbar w-full">
       <div className="flex mt-12 md:ml-12 ml-6">
         <img
           src={user?.imageUrl}
@@ -75,38 +129,83 @@ const Profile = () => {
                 </Button>
               </Link>
             ) : (
-              <Button className="bg-[#877EFF] ml-12">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mr-1"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M10 1.0415C7.8139 1.0415 6.0417 2.81371 6.0417 4.99984C6.0417 7.18596 7.8139 8.95817 10 8.95817C12.1862 8.95817 13.9584 7.18596 13.9584 4.99984C13.9584 2.81371 12.1862 1.0415 10 1.0415ZM7.2917 4.99984C7.2917 3.50407 8.50426 2.2915 10 2.2915C11.4958 2.2915 12.7084 3.50407 12.7084 4.99984C12.7084 6.49561 11.4958 7.70817 10 7.70817C8.50426 7.70817 7.2917 6.49561 7.2917 4.99984Z"
-                    fill="#fff"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M10 10.2082C8.07207 10.2082 6.2958 10.6464 4.97957 11.3868C3.68293 12.1161 2.70836 13.2216 2.70836 14.5832L2.70831 14.6681C2.70737 15.6363 2.70619 16.8515 3.77204 17.7195C4.2966 18.1466 5.03043 18.4504 6.02187 18.6511C7.01608 18.8523 8.31189 18.9582 10 18.9582C11.6882 18.9582 12.984 18.8523 13.9782 18.6511C14.9696 18.4504 15.7035 18.1466 16.228 17.7195C17.2939 16.8515 17.2927 15.6363 17.2918 14.6681L17.2917 14.5832C17.2917 13.2216 16.3171 12.1161 15.0205 11.3868C13.7043 10.6464 11.928 10.2082 10 10.2082ZM3.95836 14.5832C3.95836 13.8737 4.47618 13.1041 5.5924 12.4763C6.68903 11.8594 8.24609 11.4582 10 11.4582C11.754 11.4582 13.311 11.8594 14.4077 12.4763C15.5239 13.1041 16.0417 13.8737 16.0417 14.5832C16.0417 15.673 16.0081 16.2865 15.4387 16.7502C15.1299 17.0016 14.6138 17.2471 13.7302 17.4259C12.8494 17.6042 11.6452 17.7082 10 17.7082C8.35484 17.7082 7.15065 17.6042 6.26986 17.4259C5.3863 17.2471 4.87013 17.0016 4.56135 16.7502C3.99196 16.2865 3.95836 15.673 3.95836 14.5832Z"
-                    fill="#fff"
-                  />
-                </svg>
-                Follow
+              <Button className="bg-[#877EFF] ml-12" onClick={handleFollowUser}>
+                {isFollowingLoading || isDeletingFollowing ? (
+                  <Loader />
+                ) : isFollowing ? (
+                  <>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="mr-1"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M10 1.0415C7.8139 1.0415 6.0417 2.81371 6.0417 4.99984C6.0417 7.18596 7.8139 8.95817 10 8.95817C12.1862 8.95817 13.9584 7.18596 13.9584 4.99984C13.9584 2.81371 12.1862 1.0415 10 1.0415ZM7.2917 4.99984C7.2917 3.50407 8.50426 2.2915 10 2.2915C11.4958 2.2915 12.7084 3.50407 12.7084 4.99984C12.7084 6.49561 11.4958 7.70817 10 7.70817C8.50426 7.70817 7.2917 6.49561 7.2917 4.99984Z"
+                        fill="#fff"
+                      />
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M10 10.2082C8.07207 10.2082 6.2958 10.6464 4.97957 11.3868C3.68293 12.1161 2.70836 13.2216 2.70836 14.5832L2.70831 14.6681C2.70737 15.6363 2.70619 16.8515 3.77204 17.7195C4.2966 18.1466 5.03043 18.4504 6.02187 18.6511C7.01608 18.8523 8.31189 18.9582 10 18.9582C11.6882 18.9582 12.984 18.8523 13.9782 18.6511C14.9696 18.4504 15.7035 18.1466 16.228 17.7195C17.2939 16.8515 17.2927 15.6363 17.2918 14.6681L17.2917 14.5832C17.2917 13.2216 16.3171 12.1161 15.0205 11.3868C13.7043 10.6464 11.928 10.2082 10 10.2082ZM3.95836 14.5832C3.95836 13.8737 4.47618 13.1041 5.5924 12.4763C6.68903 11.8594 8.24609 11.4582 10 11.4582C11.754 11.4582 13.311 11.8594 14.4077 12.4763C15.5239 13.1041 16.0417 13.8737 16.0417 14.5832C16.0417 15.673 16.0081 16.2865 15.4387 16.7502C15.1299 17.0016 14.6138 17.2471 13.7302 17.4259C12.8494 17.6042 11.6452 17.7082 10 17.7082C8.35484 17.7082 7.15065 17.6042 6.26986 17.4259C5.3863 17.2471 4.87013 17.0016 4.56135 16.7502C3.99196 16.2865 3.95836 15.673 3.95836 14.5832Z"
+                        fill="#fff"
+                      />
+                    </svg>
+                    Unfollow
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="mr-1"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M10 1.0415C7.8139 1.0415 6.0417 2.81371 6.0417 4.99984C6.0417 7.18596 7.8139 8.95817 10 8.95817C12.1862 8.95817 13.9584 7.18596 13.9584 4.99984C13.9584 2.81371 12.1862 1.0415 10 1.0415ZM7.2917 4.99984C7.2917 3.50407 8.50426 2.2915 10 2.2915C11.4958 2.2915 12.7084 3.50407 12.7084 4.99984C12.7084 6.49561 11.4958 7.70817 10 7.70817C8.50426 7.70817 7.2917 6.49561 7.2917 4.99984Z"
+                        fill="#fff"
+                      />
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M10 10.2082C8.07207 10.2082 6.2958 10.6464 4.97957 11.3868C3.68293 12.1161 2.70836 13.2216 2.70836 14.5832L2.70831 14.6681C2.70737 15.6363 2.70619 16.8515 3.77204 17.7195C4.2966 18.1466 5.03043 18.4504 6.02187 18.6511C7.01608 18.8523 8.31189 18.9582 10 18.9582C11.6882 18.9582 12.984 18.8523 13.9782 18.6511C14.9696 18.4504 15.7035 18.1466 16.228 17.7195C17.2939 16.8515 17.2927 15.6363 17.2918 14.6681L17.2917 14.5832C17.2917 13.2216 16.3171 12.1161 15.0205 11.3868C13.7043 10.6464 11.928 10.2082 10 10.2082ZM3.95836 14.5832C3.95836 13.8737 4.47618 13.1041 5.5924 12.4763C6.68903 11.8594 8.24609 11.4582 10 11.4582C11.754 11.4582 13.311 11.8594 14.4077 12.4763C15.5239 13.1041 16.0417 13.8737 16.0417 14.5832C16.0417 15.673 16.0081 16.2865 15.4387 16.7502C15.1299 17.0016 14.6138 17.2471 13.7302 17.4259C12.8494 17.6042 11.6452 17.7082 10 17.7082C8.35484 17.7082 7.15065 17.6042 6.26986 17.4259C5.3863 17.2471 4.87013 17.0016 4.56135 16.7502C3.99196 16.2865 3.95836 15.673 3.95836 14.5832Z"
+                        fill="#fff"
+                      />
+                    </svg>
+                    Follow
+                  </>
+                )}
               </Button>
             )}
           </div>
           <p className="text-[#7878A3]">@{user?.userName}</p>
-          <div className="flex flex-col mt-2">
-            <p className="text-[#877EFF] lg:text-xl text-base font-medium">
-              {user?.posts.length}
-            </p>
-            <p className="lg:text-lg font-medium text-base">Posts</p>
+          <div className="flex mt-2 gap-3">
+            <div className="flex flex-col">
+              <p className="text-[#877EFF] lg:text-xl text-base font-medium">
+                {user?.posts.length}
+              </p>
+              <p className="lg:text-lg font-extralight text-sm">Posts</p>
+            </div>
+            <div className="flex flex-col">
+              <p className="text-[#877EFF] lg:text-xl text-base font-medium">
+                {user?.following.length}
+              </p>
+              <p className="lg:text-lg  font-extralight text-sm">Following</p>
+            </div>
+            <div className="flex flex-col">
+              <p className="text-[#877EFF] lg:text-xl text-base font-medium">
+                {user?.followers.length}
+              </p>
+              <p className="lg:text-lg  font-extralight text-sm">Followers</p>
+            </div>
           </div>
           <p>{user?.bio}</p>
         </div>
@@ -184,7 +283,7 @@ const Profile = () => {
           </Button>
         </div>
       )}
-       <ul className="md:ml-10 mt-10 ml-6 ">
+      <ul className="md:ml-10 mt-10 ml-6 ">
         <li>
           {isCurrentUser && activeTab === "posts" && (
             // Render user's posts if the user is viewing their own profile and activeTab is "posts"
@@ -192,7 +291,7 @@ const Profile = () => {
           )}
           {isCurrentUser && activeTab === "likes" && (
             // Render user's liked posts if the user is viewing their own profile and activeTab is "likes"
-            <GridPostList posts={data} /> 
+            <GridPostList posts={data} />
           )}
           {!isCurrentUser && (
             // Render other user's posts if the user is viewing someone else's profile
