@@ -24,10 +24,6 @@ const PostDetails = () => {
   const [comment, setComment] = useState<string>("");
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
 
-  // console.log(post);
-
-  // console.log(post?.comments);
-
   const { mutate: likeComment } = useLikeComment();
   const navigate = useNavigate();
   const formatDateDistance = (dateString: string | undefined) => {
@@ -44,7 +40,6 @@ const PostDetails = () => {
     const date = new Date(dateString);
     return formatDistanceToNow(date, { addSuffix: true });
   };
-  // console.log(post);
 
   const formattedDate = formatDateDistance(post?.$createdAt);
   const handleDeletePost = () => {
@@ -69,29 +64,8 @@ const PostDetails = () => {
     });
     setComment("");
   };
-  // const likeCommentHandler = (commentId: string) => {
-  //   if (!currentUser) throw new Error("User not found");
-  //   let newLikes = [...likes];
-  //   const hasLikes = newLikes.includes(currentUser.$id);
-
-  //   if (hasLikes) {
-  //     newLikes = newLikes.filter((like: string) => like !== currentUser.$id);
-  //   } else {
-  //     newLikes = [currentUser.$id, ...newLikes];
-  //   }
-
-  //   likeComment({
-  //     commentId: commentId,
-  //     userId: newLikes,
-  //   });
-
-  //   setLikes(newLikes);
-  // };
-
   const likeCommentHandler = (commentId: string) => {
     if (!currentUser) throw new Error("User not found");
-
-    // Create a new array based on the existing comments array
     const newComments = post?.comments.map((comment: Models.Document) => {
       if (comment.$id === commentId) {
         const existingLikes = comment.likes || [];
@@ -203,7 +177,10 @@ const PostDetails = () => {
             </div>
 
             {post?.comments.map((comment: Models.Document, index: number) => (
-              <div key={index} className="flex justify-between w-full items-start">
+              <div
+                key={index}
+                className="flex justify-between w-full gap-3"
+              >
                 <div>
                   <div className="flex items-start gap-4">
                     <img
@@ -225,7 +202,11 @@ const PostDetails = () => {
                 </div>
                 <div className="flex flex-col items-center gap-1">
                   <img
-                    src={comment.likes.includes(currentUser?.$id) ? `/assets/icons/liked.svg` : `/assets/icons/like.svg`}
+                    src={
+                      comment.likes.includes(currentUser?.$id)
+                        ? `/assets/icons/liked.svg`
+                        : `/assets/icons/like.svg`
+                    }
                     alt="like"
                     onClick={() => likeCommentHandler(comment.$id)}
                   />
