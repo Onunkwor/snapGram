@@ -10,7 +10,7 @@ import Loader from "./Loader";
 
 const UserStories = () => {
   const { data: currentUser } = useGetCurrentUser();
-  const { data: users, fetchNextPage, hasNextPage, isPending } = useGetUsers();
+  const { data: users } = useGetUsers();
   //  console.log(currentUser);
    
   if (!currentUser || !users) {
