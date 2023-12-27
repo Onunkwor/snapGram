@@ -17,13 +17,13 @@ const AllUsers = () => {
   }, [inView, fetchNextPage]);
 
   return (
-    <div className="mx-auto">
+    <div className="mx-auto custom-scrollbar">
       <div className="flex pt-16 lg:pl-8 gap-2 justify-start">
         <img src="/assets/icons/people.svg" width={30} height={30} className="text-white" alt="people" />
         <h1 className="h3-bold md:h1-bold ">All Users</h1>
       </div>
 
-      <ul className="grid grid-cols-1 lg:grid-cols-4 p-12 gap-4 lg:gap-8 justify-center">
+      <ul className="grid grid-cols-1 lg:grid-cols-4 p-10 gap-4 lg:gap-4 justify-center overflow-x-hidden overflow-y-scroll custom-scrollbar">
         {users?.pages.map((page, pageIndex) => (
           <React.Fragment key={pageIndex}>
             {page?.documents

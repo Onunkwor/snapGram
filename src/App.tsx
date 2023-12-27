@@ -7,13 +7,13 @@ import { Routes, Route } from "react-router-dom";
 import RootLayout from "./_root/RootLayout";
 import { Toaster } from "@/components/ui/toaster";
 import Explore from "./_root/Pages/Explore";
-import Saved from "./_root/Pages/Saved";
 import AllUsers from "./_root/Pages/AllUsers";
 import CreatePost from "./_root/Pages/CreatePost";
 import EditPost from "./_root/Pages/EditPost";
 import PostDetails from "./_root/Pages/PostDetails";
 import Profile from "./_root/Pages/Profile";
 import UpdateProfile from "./_root/Pages/UpdateProfile";
+import Chat from "./_root/Pages/Chat";
 const App = () => {
   return (
     <main className="flex h-screen">
@@ -28,7 +28,7 @@ const App = () => {
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
           <Route path="/explore" element={<Explore />} />
-          <Route path="/saved" element={<Saved />} />
+          <Route path="/chats" element={<Chat />} />
           <Route path="/all-users" element={<AllUsers />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />

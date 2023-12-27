@@ -9,7 +9,6 @@ const RightSideBar = () => {
   const { data: users, fetchNextPage, hasNextPage, isPending } = useGetUsers();
   const { ref, inView } = useInView();
   const { user: currentUser } = useUserContext();
-  // console.log(currentUser);
 
   useEffect(() => {
     if (inView) {
