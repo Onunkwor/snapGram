@@ -23,7 +23,7 @@ const AllUsers = () => {
         <h1 className="h3-bold md:h1-bold ">All Users</h1>
       </div>
 
-      <ul className="grid grid-cols-1 lg:grid-cols-4 p-10 gap-4 lg:gap-4 justify-center overflow-x-hidden overflow-y-scroll custom-scrollbar">
+      <ul className="grid grid-cols-1 lg:grid-cols-3 p-10 gap-4 lg:gap-4 justify-center overflow-x-hidden overflow-y-scroll custom-scrollbar">
         {users?.pages.map((page, pageIndex) => (
           <React.Fragment key={pageIndex}>
             {page?.documents
