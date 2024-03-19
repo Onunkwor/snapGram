@@ -3,10 +3,18 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { sidebarLinks } from "@/constants";
 import { INavLink } from "@/types";
 import { UserButton, useAuth } from "@clerk/clerk-react";
+import axios from "axios";
+import { useEffect } from "react";
 
 const LeftSidebar = () => {
   const { pathname } = useLocation();
   const { userId } = useAuth();
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4000/users/${userId}`)
+      .then((response) => console.log(response));
+  }, [userId]);
+
   return (
     <nav className="leftsidebar">
       <div className="flex flex-col gap-8">
