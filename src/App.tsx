@@ -1,15 +1,17 @@
-import { useEffect } from "react";
 import "./globals.css";
+import { Toaster } from "sonner";
 import Router from "./router/Router";
-import axios from "axios";
-const App = () => {
-  useEffect(() => {
-    axios
-      .get("http://localhost:4000/users")
-      .then((response) => console.log(response));
-  }, []);
+import { AuthProvider } from "./context/AuthContext";
 
-  return <Router />;
+const App = () => {
+  return (
+    <>
+      <AuthProvider>
+        <Toaster richColors />
+        <Router />
+      </AuthProvider>
+    </>
+  );
 };
 
 export default App;

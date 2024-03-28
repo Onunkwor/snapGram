@@ -1,52 +1,66 @@
-// // UserStories component
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-// import {
-//   useGetCurrentUser,
-//   useGetUsers,
-// } from "@/lib/react-query/queriesAndMutation";
-// import { Models } from "appwrite";
-// import { Link } from "react-router-dom";
-// import Loader from "./Loader";
+import { useGetUsers } from "@/lib/react-query/queriesAndMutation";
+import Loader from "./Loader";
+import { IUser } from "@/types";
+import { useUserContext } from "@/context/AuthContext";
 
-// const UserStories = () => {
-//   const { data: currentUser } = useGetCurrentUser();
-//   const { data: users } = useGetUsers();
-//   //  console.log(currentUser);
+const UserStories = () => {
+  const currentUser = useUserContext();
+  const { data: users } = useGetUsers();
 
-//   if (!currentUser || !users) {
-//     return (
-//       <div className="flex w-full justify-center">
-//         <Loader />
-//       </div>
-//     );
-//   }
+  if (!currentUser || !users) {
+    return (
+      <div className="flex w-full justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
-//   return (
-//     <div className="flex gap-4 w-full overflow-x-auto no-scrollbar">
-//       <Link to={`/profile/${currentUser?.$id}`}>
-//         <div className="btn-gradient-1">
-//           <img
-//             src={currentUser?.imageUrl}
-//             alt="image"
-//             className="w-[72px] h-[72px] rounded-full object-cover"
-//           />
-//         </div>
-//       </Link>
-//       {users?.pages.map((page) =>
-//         page?.documents.map((user: Models.Document) => (
-//           <Link to={`/profile/${user.$id}`} key={user.$id}>
-//             <div className="btn-gradient-1">
-//               <img
-//                 src={user.imageUrl}
-//                 alt="image"
-//                 className="w-[72px] h-[72px] rounded-full object-cover"
-//               />
-//             </div>
-//           </Link>
-//         ))
-//       )}
-//     </div>
-//   );
-// };
+  return (
+    <div className="flex gap-4 w-full overflow-x-auto no-scrollbar">
+      <div className="btn-gradient-1">
+        <Dialog>
+          <DialogTrigger>
+            <img
+              src={currentUser?.photo}
+              alt="image"
+              className="w-[72px] h-[72px] rounded-full object-cover"
+            />
+          </DialogTrigger>
+          <DialogContent className="bg-transparent flex justify-center items-center  border-none">
+            <img
+              src={currentUser?.photo}
+              className="w-[300px] h-[300px] object-cover rounded-2xl"
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+      {users?.pages.map((page) =>
+        page
+          ?.filter((user: IUser) => user._id !== currentUser._id)
+          .map((user: IUser) => (
+            <div className="btn-gradient-1" key={user._id}>
+              <Dialog>
+                <DialogTrigger>
+                  <img
+                    src={user.photo}
+                    alt="image"
+                    className="w-[72px] h-[72px] rounded-full object-cover"
+                  />
+                </DialogTrigger>
+                <DialogContent className="bg-transparent flex justify-center items-center border-none ">
+                  <img
+                    src={user.photo}
+                    className="w-[300px] h-[300px] object-cover rounded-2xl"
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          ))
+      )}
+    </div>
+  );
+};
 
-// export default UserStories;
+export default UserStories;

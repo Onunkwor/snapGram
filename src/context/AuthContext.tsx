@@ -1,94 +1,44 @@
-// import { useNavigate } from "react-router-dom";
-// import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { IUser } from "@/types";
+import { useAuth } from "@clerk/clerk-react";
+import { getCurrentUser } from "@/lib/database/api";
 
-// import { IUser } from "@/types";
-// import { getCurrentUser } from "@/lib/Appwrite/api";
+const AuthContext = createContext<IUser | null>(null);
 
-// export const INITIAL_USER = {
-//   id: "",
-//   name: "",
-//   userName: "",
-//   email: "",
-//   imageUrl: "",
-//   bio: "",
-// };
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-// const INITIAL_STATE = {
-//   user: INITIAL_USER,
-//   isLoading: false,
-//   isAuthenticated: false,
-//   setUser: () => {},
-//   setIsAuthenticated: () => {},
-//   checkAuthUser: async () => false as boolean,
-// };
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [userData, setUserData] = useState<IUser | null>(null);
+  const { userId } = useAuth();
 
-// type IContextType = {
-//   user: IUser;
-//   isLoading: boolean;
-//   setUser: React.Dispatch<React.SetStateAction<IUser>>;
-//   isAuthenticated: boolean;
-//   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-//   checkAuthUser: () => Promise<boolean>;
-// };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (userId) {
+          const currentAccount = await getCurrentUser(userId);
+          console.log();
 
-// const AuthContext = createContext<IContextType>(INITIAL_STATE);
+          setUserData(currentAccount[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
-// export function AuthProvider({ children }: { children: React.ReactNode }) {
-//   const navigate = useNavigate();
-//   const [user, setUser] = useState<IUser>(INITIAL_USER);
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const [isLoading, setIsLoading] = useState(false);
+    fetchUserData();
+  }, [userId]);
 
-//   const checkAuthUser = async () => {
-//     setIsLoading(true);
-//     try {
-//       const currentAccount = await getCurrentUser();
-//       if (currentAccount) {
-//         setUser({
-//           id: currentAccount.$id,
-//           name: currentAccount.name,
-//           userName: currentAccount.userName,
-//           email: currentAccount.email,
-//           imageUrl: currentAccount.imageUrl,
-//           bio: currentAccount.bio,
-//         });
-//         setIsAuthenticated(true);
+  return (
+    <AuthContext.Provider value={userData}>{children}</AuthContext.Provider>
+  );
+};
 
-//         return true;
-//       }
-
-//       return false;
-//     } catch (error) {
-//       console.error(error);
-//       return false;
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     const cookieFallback = localStorage.getItem("cookieFallback");
-//     if (
-//       cookieFallback === "[]" ||
-//       cookieFallback === null ||
-//       cookieFallback === undefined
-//     ) {
-//       navigate("/sign-in");
-//     }
-
-//     checkAuthUser();
-//   }, []);
-
-//   const value = {
-//     user,
-//     setUser,
-//     isLoading,
-//     isAuthenticated,
-//     setIsAuthenticated,
-//     checkAuthUser,
-//   };
-
-//   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-// }
-
-// export const useUserContext = () => useContext(AuthContext);
+export const useUserContext = () => useContext(AuthContext);

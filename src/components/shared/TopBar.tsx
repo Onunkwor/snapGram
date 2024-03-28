@@ -1,7 +1,6 @@
+import { UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
 
-// import { useAuth } from "@clerk/clerk-react";
 const TopBar = () => {
   // const { userId } = useAuth();
 
@@ -17,18 +16,7 @@ const TopBar = () => {
           />
         </Link>
 
-        <div className="flex gap-5">
-          <Button variant="ghost" className="shad-button_ghost">
-            <img src="/assets/icons/logout.svg" alt="logout" />
-          </Button>
-          {/* <Link to={`/profile/${userId}`} className="flex-center gap-3">
-            <img
-              src={user.imageUrl}
-              alt="profile"
-              className="h-8 w-8 rounded-full"
-            />
-          </Link> */}
-        </div>
+        <UserButton afterSignOutUrl="/sign-in" />
       </div>
     </section>
   );

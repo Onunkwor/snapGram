@@ -23,30 +23,70 @@ export type IUpdateUser = {
 };
 
 export type INewPost = {
-  userId: string;
+  creator: string;
   caption: string;
   file: File[];
+  imageName: string;
+  imageUrl: string;
   location?: string;
   tags?: string;
+  createdAt: number;
+};
+export type IPost = {
+  _id: string;
+  creator: {
+    _id: string;
+    firstName: string;
+    username: string;
+    lastName: string;
+    photo: string;
+    clerkId: string;
+    email: string;
+  };
+  caption: string;
+  imageUrl: string;
+  location: string;
+  tags: [];
+  createdAt: number;
+  likes: string[];
+  saved: string[];
+  comments: [];
 };
 
 export type IUpdatePost = {
   postId: string;
   caption: string;
-  imageId: string;
-  imageUrl: URL;
+  imageUrl: string;
   file: File[];
   location?: string;
   tags?: string;
 };
 
+export type ILikePost = {
+  postId: string;
+  likes: string[];
+};
+export type ILikeComment = {
+  commentId: string;
+  likes: string[];
+};
+export type ISavePost = {
+  user: string;
+  postId: string;
+  createdAt: number;
+};
+
 export type IUser = {
-  id: string;
-  name: string;
-  userName: string;
+  _id: string;
+  clerkId: string;
   email: string;
-  imageUrl: string;
-  bio: string;
+  firstName: string;
+  lastName: string;
+  photo: string;
+  username: string;
+  saved: [];
+  followers: [];
+  following: [];
 };
 
 export type INewUser = {
@@ -55,40 +95,20 @@ export type INewUser = {
   username: string;
   password: string;
 };
-export type ICurrentUser = {
-  $collectionId: string;
-  $createdAt: string;
-  $databaseId: string;
-  $id: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  $permissions: any[];
-  $updatedAt: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Liked?: any[];
-  accountID?: string;
-  bio?: string | null;
-  email?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  followers?: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  following?: any[];
-  imageId?: string | null;
-  imageUrl?: string;
-  name?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  posts?: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  save?: any[];
-  userName?: string;
+
+export type IAddComment = {
+  user: string;
+  postId: string;
+  comment: string;
+  likes?: string[];
+  createdAt: number;
 };
-export type IFollowing = {
-  $collectionId: string;
-  $createdAt: string;
-  $databaseId: string;
-  $id: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  $permissions: any[];
-  $updatedAt: string;
-  userId: string;
-  userName: string;
+
+export type IComment = {
+  _id: string;
+  user: IUser;
+  postId: string;
+  comment: string;
+  likes?: string[];
+  createdAt: number;
 };

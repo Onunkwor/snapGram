@@ -1,19 +1,12 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
-
 import { sidebarLinks } from "@/constants";
 import { INavLink } from "@/types";
-import { UserButton, useAuth } from "@clerk/clerk-react";
-import axios from "axios";
-import { useEffect } from "react";
+import { useUserContext } from "@/context/AuthContext";
+import { UserButton } from "@clerk/clerk-react";
 
 const LeftSidebar = () => {
   const { pathname } = useLocation();
-  const { userId } = useAuth();
-  useEffect(() => {
-    axios
-      .get(`http://localhost:4000/users/${userId}`)
-      .then((response) => console.log(response));
-  }, [userId]);
+  const userData = useUserContext();
 
   return (
     <nav className="leftsidebar">
@@ -26,14 +19,13 @@ const LeftSidebar = () => {
             height={36}
           />
         </Link>
-        <Link to={`/profile/${userId}`} className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center">
           <UserButton afterSignOutUrl="/sign-in" />
           <div className="flex flex-col">
-            <p className="body bold">{userId}</p>
-            <p className="small-regular text-light-3">@{userId}</p>
+            <p className="body bold">{userData?.firstName}</p>
+            <p className="small-regular text-light-3">@{userData?.username}</p>
           </div>
-        </Link>
-
+        </div>
         <ul className="flex flex-col gap-3 ">
           {sidebarLinks.map((link: INavLink) => {
             const isActive = pathname === link.route;
@@ -45,7 +37,11 @@ const LeftSidebar = () => {
                 }`}
               >
                 <NavLink
-                  to={link.route}
+                  to={
+                    link.route === "/profile"
+                      ? `/profile/${userData?._id}`
+                      : link.route
+                  }
                   className="p-4 flex items-center gap-4"
                 >
                   <img
