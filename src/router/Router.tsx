@@ -26,10 +26,10 @@ const router = createBrowserRouter([
       { path: "profile/:id", element: <Profile /> },
       { path: "all-users", element: <AllUsers /> },
       { path: "/update-post/:id", element: <EditPost /> },
-      { path: "sign-in", element: <SignInPage /> },
-      { path: "sign-up", element: <SignUpPage /> },
     ],
   },
+  { path: "/sign-in", element: <SignInPage /> },
+  { path: "/sign-up", element: <SignUpPage /> },
 ]);
 
 const Router = () => {
