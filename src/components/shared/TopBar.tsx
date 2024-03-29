@@ -2,8 +2,6 @@ import { UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 
 const TopBar = () => {
-  // const { userId } = useAuth();
-
   return (
     <section className="topbar">
       <div className="flex-between py-4 px-5">
