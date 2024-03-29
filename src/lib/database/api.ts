@@ -183,9 +183,7 @@ export async function deletePost({
     // Delete all comments associated with the post
     if (postData.comments && postData.comments.length > 0) {
       for (const commentId of postData.comments) {
-        await axios.delete(
-          `https://snap-gram-back-end.vercel.app/comments/${commentId}`
-        );
+        await axios.delete(`/comments/${commentId}`);
       }
     }
     console.log("deleting saves");
@@ -211,7 +209,7 @@ export async function deletePost({
     }
 
     // Delete the post itself
-    await axios.delete(`https://snap-gram-back-end.vercel.app/posts/${postId}`);
+    await axios.delete(`/posts/${postId}`);
 
     console.log("File deleted successfully");
 
