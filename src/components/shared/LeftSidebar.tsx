@@ -20,7 +20,7 @@ const LeftSidebar = () => {
           />
         </Link>
         <div className="flex gap-3 items-center">
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton afterSignOutUrl="https://pure-kangaroo-63.accounts.dev/sign-up" />
           <div className="flex flex-col">
             <p className="body bold">{userData?.firstName}</p>
             <p className="small-regular text-light-3">@{userData?.username}</p>
