@@ -4,12 +4,12 @@ import ProtectedRoutes from "@/ProtectedRoutes";
 import Home from "@/_root/Pages/Home";
 import Explore from "@/_root/Pages/Explore";
 import CreatePost from "@/_root/Pages/CreatePost";
-import SignInPage from "@/Auth/SignInPage";
-import SignUpPage from "@/Auth/SignUpPage";
+import SignUpPage from "@/SignUpPage";
 import PostDetails from "@/_root/Pages/PostDetails";
 import Profile from "@/_root/Pages/Profile";
 import AllUsers from "@/_root/Pages/AllUsers";
 import EditPost from "@/_root/Pages/EditPost";
+import SignInPage from "@/sign-in/[[...index]]";
 const router = createBrowserRouter([
   {
     path: "/",
