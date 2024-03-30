@@ -28,7 +28,7 @@ const RightSideBar = () => {
     <div>
       <h2 className="p-8 h3-bold md:h2-bold">Top Creators</h2>
 
-      <ul className="grid grid-cols-2 p-8 gap-8">
+      <ul className="grid grid-cols-2 p-8 gap-8 ">
         {data?.pages.map((page, pageIndex) => (
           <React.Fragment key={pageIndex}>
             {page

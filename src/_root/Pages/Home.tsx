@@ -25,7 +25,7 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       <div className="home-container h-screen overflow-y-scroll">
-        <div className="w-[350px] md:w-[400px] custom">
+        <div className="w-[350px] md:w-[400px]">
           <UserStories />
         </div>
         <div className="home-posts">
@@ -50,7 +50,7 @@ const Home = () => {
           </div>
         )}
       </div>
-      <div className="w-465 hidden lg:block overflow-x-hidden overflow-y-scroll custom-scrollbar">
+      <div className="w-465 hidden lg:block h-screen overflow-x-hidden overflow-y-scroll custom-scrollbar">
         <RightSideBar />
       </div>
     </div>

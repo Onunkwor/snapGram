@@ -18,17 +18,17 @@ const UserStories = () => {
   }
 
   return (
-    <div className="flex gap-4 w-full overflow-x-auto no-scrollbar">
+    <div className="flex gap-4 !w-full !overflow-x-scroll">
       <div className="btn-gradient-1">
         <Dialog>
           <DialogTrigger>
             <img
               src={currentUser?.photo}
               alt="image"
-              className="w-[72px] h-[72px] rounded-full object-cover"
+              className="!w-[72px] !h-[72px] rounded-full object-cover"
             />
           </DialogTrigger>
-          <DialogContent className="bg-transparent flex justify-center items-center  border-none">
+          <DialogContent className="bg-transparent flex justify-center items-center border-none">
             <img
               src={currentUser?.photo}
               className="w-[300px] h-[300px] object-cover rounded-2xl"
@@ -46,7 +46,7 @@ const UserStories = () => {
                   <img
                     src={user.photo}
                     alt="image"
-                    className="w-[72px] h-[72px] rounded-full object-cover"
+                    className="!w-[72px] !h-[72px] rounded-full object-cover"
                   />
                 </DialogTrigger>
                 <DialogContent className="bg-transparent flex justify-center items-center border-none ">
