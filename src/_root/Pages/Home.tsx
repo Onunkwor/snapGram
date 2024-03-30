@@ -1,7 +1,7 @@
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
 import RightSideBar from "@/components/shared/RightSideBar";
-import UserStories from "@/components/shared/UserStories";
+// import UserStories from "@/components/shared/UserStories";
 import { useGetPosts } from "@/lib/react-query/queriesAndMutation";
 import { IPost } from "@/types";
 import { useEffect } from "react";
@@ -25,9 +25,9 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       <div className="home-container h-screen overflow-y-scroll">
-        <div className="w-[350px] md:w-[400px]">
+        {/* <div className="w-[350px] md:w-[400px]">
           <UserStories />
-        </div>
+        </div> */}
         <div className="home-posts">
           <h2 className="h3-bold md:h2-bold text-left w-full">Home feed</h2>
           {isPostLoading && !posts ? (

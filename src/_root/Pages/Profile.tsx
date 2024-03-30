@@ -108,7 +108,7 @@ const Profile = () => {
             </h1>
             {isCurrentUser ? (
               <Link to={`/update-profile/${user?._id}`}>
-                <Button className="ml-2 text-white text-xs md:text-md cursor-pointer flex gap-2 p-2 px-4 bg-[#101012] rounded-lg">
+                <Button className="ml-2 text-white text-xs md:text-md cursor-pointer gap-2 p-2 px-4 bg-[#101012] rounded-lg hidden">
                   <svg
                     width="24"
                     height="24"
