@@ -10,6 +10,7 @@ import Profile from "@/_root/Pages/Profile";
 import AllUsers from "@/_root/Pages/AllUsers";
 import EditPost from "@/_root/Pages/EditPost";
 import SignInPage from "@/sign-in/[[...index]]";
+import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path: "/sign-up",
     element: <SignUpPage />,
+  },
+  {
+    path: "/sso-callback",
+    element: <AuthenticateWithRedirectCallback />,
   },
 ]);
 
