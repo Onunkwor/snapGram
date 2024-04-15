@@ -8,7 +8,7 @@ const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
     return (
       <div className="w-full h-screen flex justify-center items-center">
         <div className="loader">
-          <Loader />;
+          <Loader />
         </div>
       </div>
     );
