@@ -21,9 +21,11 @@ import { v4 } from "uuid";
 // User QUERIES
 // ============================================================
 //====================================================GetCurrentUsers
+
+const baseUrl = import.meta.env.VITE_BASE_URL;
 export async function getCurrentUser(clerkId: string) {
   try {
-    const url = `https://snap-gram-back-end.vercel.app/users/clerk/${clerkId}`;
+    const url = `${baseUrl}/users/clerk/${clerkId}`;
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -35,7 +37,7 @@ export async function getCurrentUser(clerkId: string) {
 //====================================================GetAllUsers
 export async function getAllUsers({ pageParam }: { pageParam?: number }) {
   try {
-    const url = `https://snap-gram-back-end.vercel.app/users?cursor=${pageParam}`; // Construct the URL
+    const url = `${baseUrl}/users?cursor=${pageParam}`; // Construct the URL
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -47,9 +49,7 @@ export async function getAllUsers({ pageParam }: { pageParam?: number }) {
 //=====================================================GetUserById
 export async function getUserById(id: string) {
   try {
-    const response = await axios.get(
-      `https://snap-gram-back-end.vercel.app/users/${id}`
-    );
+    const response = await axios.get(`${baseUrl}/users/${id}`);
     return response.data;
   } catch (error) {
     console.log("Error fetching user by Id", error);
@@ -65,13 +65,10 @@ export async function followingUser({
   followersRecord: string;
 }) {
   try {
-    const response = await axios.patch(
-      "https://snap-gram-back-end.vercel.app/users/follow",
-      {
-        followingRecord,
-        followersRecord,
-      }
-    );
+    const response = await axios.patch(`${baseUrl}/users/follow`, {
+      followingRecord,
+      followersRecord,
+    });
     return response.data;
   } catch (error) {
     console.log("Error folllowing user", error);
@@ -92,15 +89,12 @@ export async function deleteFollowing({
   followerRecordList: string[];
 }) {
   try {
-    const response = await axios.patch(
-      "https://snap-gram-back-end.vercel.app/users/unFollow",
-      {
-        currentUser,
-        user,
-        followingRecordList,
-        followerRecordList,
-      }
-    );
+    const response = await axios.patch(`${baseUrl}/users/unFollow`, {
+      currentUser,
+      user,
+      followingRecordList,
+      followerRecordList,
+    });
     return response.data;
   } catch (error) {
     console.log("Error unfollowing user", error);
@@ -142,10 +136,7 @@ export async function createPost(post: INewPost) {
       comments: [],
       createdAt: post.createdAt,
     };
-    const response = await axios.post(
-      "https://snap-gram-back-end.vercel.app/posts",
-      newPost
-    );
+    const response = await axios.post(`${baseUrl}/posts`, newPost);
 
     if (!response) {
       deleteObject(imageRef);
@@ -172,16 +163,14 @@ export async function deletePost({
     console.log("Getting posts");
 
     // Fetch the post by its ID
-    const post = await axios.get(
-      `https://snap-gram-back-end.vercel.app/posts/post/${postId}`
-    );
+    const post = await axios.get(`${baseUrl}/posts/post/${postId}`);
     const postData = post.data;
     console.log("deleting comments");
 
     // Delete all comments associated with the post
     if (postData.comments && postData.comments.length > 0) {
       for (const commentId of postData.comments) {
-        await axios.delete(`/comments/${commentId}`);
+        await axios.delete(`${baseUrl}/comments/${commentId}`);
       }
     }
     console.log("deleting saves");
@@ -189,9 +178,7 @@ export async function deletePost({
     // Delete all saves associated with the post
     if (postData.saved && postData.saved.length > 0) {
       for (const savedId of postData.saved) {
-        await axios.delete(
-          `https://snap-gram-back-end.vercel.app/saves/${savedId}`
-        );
+        await axios.delete(`${baseUrl}/saves/${savedId}`);
       }
     }
     console.log("deleting post");
@@ -207,7 +194,7 @@ export async function deletePost({
     }
 
     // Delete the post itself
-    await axios.delete(`/posts/${postId}`);
+    await axios.delete(`${baseUrl}/posts/${postId}`);
 
     console.log("File deleted successfully");
 
@@ -220,7 +207,7 @@ export async function deletePost({
 //=================================================GetPostById
 export async function getPostById(id: string) {
   try {
-    const url = `https://snap-gram-back-end.vercel.app/posts/post/${id}`; // Construct the URL
+    const url = `${baseUrl}/posts/post/${id}`; // Construct the URL
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -232,7 +219,7 @@ export async function getPostById(id: string) {
 //===================================================GetAllPosts
 export async function getAllPosts({ pageParam }: { pageParam?: number }) {
   try {
-    const url = `https://snap-gram-back-end.vercel.app/posts?cursor=${pageParam}`; // Construct the URL
+    const url = `${baseUrl}/posts?cursor=${pageParam}`; // Construct the URL
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -244,7 +231,7 @@ export async function getAllPosts({ pageParam }: { pageParam?: number }) {
 //===================================================GetEntirePost
 export async function getEntirePosts() {
   try {
-    const url = "https://snap-gram-back-end.vercel.app/posts/allPosts";
+    const url = `${baseUrl}/posts/allPosts`;
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -267,10 +254,7 @@ export async function addComment(data: IAddComment) {
       likes: data.likes,
       createdAt: data.createdAt,
     };
-    const response = await axios.post(
-      "https://snap-gram-back-end.vercel.app/comments",
-      newComment
-    );
+    const response = await axios.post(`${baseUrl}/comments`, newComment);
     return response.data;
   } catch (error) {
     console.error("Error adding comment to database", error);
@@ -288,7 +272,7 @@ export async function likeComment(data: ILikeComment) {
       likes: data.likes,
     };
     const response = await axios.patch(
-      `https://snap-gram-back-end.vercel.app/comments/${data.commentId}`,
+      `${baseUrl}/comments/${data.commentId}`,
       likeComment
     );
     return response.data;
@@ -308,7 +292,7 @@ export async function likePost(data: ILikePost) {
       likes: data.likes,
     };
     const response = await axios.patch(
-      `https://snap-gram-back-end.vercel.app/posts/likes/${data.postId}`,
+      `${baseUrl}/posts/likes/${data.postId}`,
       newLike
     );
     return response.data;
@@ -330,10 +314,7 @@ export async function savePost(data: ISavePost) {
       postId: data.postId,
       createdAt: data.createdAt,
     };
-    const response = await axios.post(
-      `https://snap-gram-back-end.vercel.app/saves`,
-      newSave
-    );
+    const response = await axios.post(`${baseUrl}/saves`, newSave);
     return response.data;
   } catch (error) {
     console.error("Error updating post likes database", error);
@@ -347,9 +328,7 @@ export async function deleteSavePost(id: string) {
       toast.error("Error delete post");
       return;
     }
-    const response = await axios.delete(
-      `https://snap-gram-back-end.vercel.app/saves/${id}`
-    );
+    const response = await axios.delete(`${baseUrl}/saves/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error updating post likes database", error);
@@ -360,7 +339,7 @@ export async function deleteSavePost(id: string) {
 //======================================================SearchPosts
 export async function searchPosts(searchTerm: string) {
   try {
-    const url = `https://snap-gram-back-end.vercel.app/posts/searchPost?query=${searchTerm}`;
+    const url = `${baseUrl}/posts/searchPost?query=${searchTerm}`;
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -370,24 +349,39 @@ export async function searchPosts(searchTerm: string) {
 //=================================================UpdatePost
 export async function updatePost(data: IUpdatePost) {
   try {
-    const oldImageRef = ref(storage, data.imageUrl);
-    await deleteObject(oldImageRef);
-    const imageRef = ref(storage, `postImages/${data.file[0].name}-${v4()}`);
-    const uploadedImage = await uploadBytes(imageRef, data.file[0]);
-    if (!uploadedImage) throw Error("File upload failed");
-    const uploadedImageUrl = await getDownloadURL(imageRef);
-    if (!uploadedImageUrl) {
-      deleteObject(imageRef);
-      throw Error("File upload failed");
+    if (data.file.length === 1) {
+      const oldImageRef = ref(storage, data.imageUrl);
+      await deleteObject(oldImageRef);
+      const imageRef = ref(storage, `postImages/${data.file[0].name}-${v4()}`);
+      const uploadedImage = await uploadBytes(imageRef, data.file[0]);
+      if (!uploadedImage) throw Error("File upload failed");
+      const uploadedImageUrl = await getDownloadURL(imageRef);
+      if (!uploadedImageUrl) {
+        deleteObject(imageRef);
+        throw Error("File upload failed");
+      }
+      const newData = {
+        caption: data.caption,
+        imageUrl: uploadedImageUrl,
+        location: data.location,
+        tags: data.tags,
+      };
+      console.log(newData);
+      const response = await axios.patch(
+        `${baseUrl}/posts/updatePost/${data.postId} `,
+        newData
+      );
+      return response.data;
     }
     const newData = {
       caption: data.caption,
-      imageUrl: uploadedImageUrl,
+      imageUrl: data.imageUrl,
       location: data.location,
       tags: data.tags,
     };
+    console.log(newData);
     const response = await axios.patch(
-      `https://snap-gram-back-end.vercel.app/posts/updatePost/${data.postId} `,
+      `${baseUrl}/posts/updatePost/${data.postId} `,
       newData
     );
     return response.data;
