@@ -39,7 +39,7 @@ const LeftSidebar = () => {
                 <NavLink
                   to={
                     link.route === "/profile"
-                      ? `/profile/${userData?._id}`
+                      ? `/profile/${btoa(userData?._id || "")}`
                       : link.route
                   }
                   className="p-4 flex items-center gap-4"

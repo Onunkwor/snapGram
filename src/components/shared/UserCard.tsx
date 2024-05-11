@@ -68,7 +68,7 @@ const UserCard = ({ user, action }: UserProps) => {
 
   return (
     <span>
-      <Link to={`/profile/${user._id}`}>
+      <Link to={`/profile/${btoa(user._id)}`}>
         <div
           className={`w-48 h-48 border flex flex-col justify-center p-10 gap-2 items-center rounded-3xl ${
             action === "All User" ? "border-[#101012]" : "border-white"

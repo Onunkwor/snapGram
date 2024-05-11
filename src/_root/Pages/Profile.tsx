@@ -13,7 +13,11 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const Profile = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: encodedId } = useParams<{ id: string }>();
+
+  const id = encodedId ? atob(encodedId) : "";
+  console.log(id);
+
   const currentUser = useUserContext();
   const [activeTab, setActiveTab] = useState("posts");
   const { data: allPosts } = useGetEntirePost();

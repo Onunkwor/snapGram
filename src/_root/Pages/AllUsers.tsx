@@ -18,7 +18,7 @@ const AllUsers = () => {
   }, [inView, fetchNextPage]);
 
   return (
-    <div className="mx-auto custom-scrollbar">
+    <div className="mx-auto custom-scrollbar h-screen overflow-y-auto w-full">
       <div className="flex pt-16 gap-2 justify-center">
         <img
           src="/assets/icons/people.svg"
