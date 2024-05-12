@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   useInfiniteQuery,
   useMutation,
@@ -56,13 +57,6 @@ export const useCreatePost = () => {
   });
 };
 
-// export const useGetRecentPosts = () => {
-//   return useQuery({
-//     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-//     queryFn: getRecentPosts,
-//   });
-// };
-
 export const useLikePost = () => {
   const queryClient = useQueryClient();
 
@@ -89,16 +83,15 @@ export const useLikePost = () => {
 };
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ postId, imageUrl }: { postId: string; imageUrl: string }) =>
       deletePost({ postId, imageUrl }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+        queryKey: [QUERY_KEYS.GET_POSTS],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
+        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],

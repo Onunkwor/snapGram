@@ -2,9 +2,12 @@ import { useAuth } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import Loader from "@/components/shared/Loader";
+import { useToken } from "@/context/tokenContext";
 const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
   const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) {
+  const token = useToken();
+
+  if (!isLoaded && token.token === null) {
     return (
       <div className="w-full h-screen flex justify-center items-center">
         <div className="loader">

@@ -136,12 +136,15 @@ export async function createPost(post: INewPost) {
       comments: [],
       createdAt: post.createdAt,
     };
+    console.log(newPost);
+
     const response = await axios.post(`${baseUrl}/posts`, newPost);
 
     if (!response) {
       deleteObject(imageRef);
       throw Error("Failed to upload to mongodb");
     }
+    toast.success("Post uploaded successfully");
     return response.data;
   } catch (error) {
     console.log("Error creating post:", error);
@@ -160,12 +163,12 @@ export async function deletePost({
     if (!postId || !imageUrl) {
       throw new Error("Provide the postId and the imageUrl");
     }
-    console.log("Getting posts");
+    // console.log("Getting posts");
 
     // Fetch the post by its ID
     const post = await axios.get(`${baseUrl}/posts/post/${postId}`);
     const postData = post.data;
-    console.log("deleting comments");
+    // console.log("deleting comments");
 
     // Delete all comments associated with the post
     if (postData.comments && postData.comments.length > 0) {
@@ -173,7 +176,7 @@ export async function deletePost({
         await axios.delete(`${baseUrl}/comments/${commentId}`);
       }
     }
-    console.log("deleting saves");
+    // console.log("deleting saves");
 
     // Delete all saves associated with the post
     if (postData.saved && postData.saved.length > 0) {
@@ -181,13 +184,13 @@ export async function deletePost({
         await axios.delete(`${baseUrl}/saves/${savedId}`);
       }
     }
-    console.log("deleting post");
+    // console.log("deleting post");
 
     try {
-      console.log("Deleting image from Firebase Storage. Image URL:", imageUrl);
+      // console.log("Deleting image from Firebase Storage. Image URL:", imageUrl);
       const imageRef = ref(storage, imageUrl);
       await deleteObject(imageRef);
-      console.log("File deleted successfully");
+      // console.log("File deleted successfully");
     } catch (error) {
       console.error("Error deleting image from Firebase Storage:", error);
       throw error;
@@ -196,8 +199,8 @@ export async function deletePost({
     // Delete the post itself
     await axios.delete(`${baseUrl}/posts/${postId}`);
 
-    console.log("File deleted successfully");
-
+    // console.log("File deleted successfully");
+    toast.success("Post deleted successfully");
     return { message: "Post and associated data deleted successfully" };
   } catch (error) {
     console.log("Error deleting post:", error);
@@ -366,7 +369,7 @@ export async function updatePost(data: IUpdatePost) {
         location: data.location,
         tags: data.tags,
       };
-      console.log(newData);
+      // console.log(newData);
       const response = await axios.patch(
         `${baseUrl}/posts/updatePost/${data.postId} `,
         newData
@@ -379,7 +382,7 @@ export async function updatePost(data: IUpdatePost) {
       location: data.location,
       tags: data.tags,
     };
-    console.log(newData);
+    // console.log(newData);
     const response = await axios.patch(
       `${baseUrl}/posts/updatePost/${data.postId} `,
       newData

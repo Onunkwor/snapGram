@@ -1,6 +1,7 @@
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
 import RightSideBar from "@/components/shared/RightSideBar";
+// import { useToken } from "@/context/tokenContext";
 // import UserStories from "@/components/shared/UserStories";
 import { useGetPosts } from "@/lib/react-query/queriesAndMutation";
 import { IPost } from "@/types";
@@ -8,6 +9,7 @@ import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 
 const Home = () => {
+  // const token = useToken();
   const {
     data: posts,
     fetchNextPage,
