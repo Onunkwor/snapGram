@@ -199,12 +199,13 @@ export async function deletePost({
     // Delete the post itself
     await axios.delete(`${baseUrl}/posts/${postId}`);
 
-    // console.log("File deleted successfully");
     toast.success("Post deleted successfully");
     return { message: "Post and associated data deleted successfully" };
   } catch (error) {
     console.log("Error deleting post:", error);
-    throw error; // Re-throw the error to propagate it to the caller
+    toast.error("Something went wrong");
+    throw error;
+    // Re-throw the error to propagate it to the caller
   }
 }
 //=================================================GetPostById
@@ -258,6 +259,7 @@ export async function addComment(data: IAddComment) {
       createdAt: data.createdAt,
     };
     const response = await axios.post(`${baseUrl}/comments`, newComment);
+    toast.success("Comment added");
     return response.data;
   } catch (error) {
     console.error("Error adding comment to database", error);
@@ -318,6 +320,7 @@ export async function savePost(data: ISavePost) {
       createdAt: data.createdAt,
     };
     const response = await axios.post(`${baseUrl}/saves`, newSave);
+    toast.success("Post saved");
     return response.data;
   } catch (error) {
     console.error("Error updating post likes database", error);
@@ -387,8 +390,10 @@ export async function updatePost(data: IUpdatePost) {
       `${baseUrl}/posts/updatePost/${data.postId} `,
       newData
     );
+    toast.success("Post updated successfully");
     return response.data;
   } catch (error) {
     console.log("Error updating post", error);
+    toast.error("Something went wrong");
   }
 }

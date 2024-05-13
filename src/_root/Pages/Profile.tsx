@@ -16,7 +16,7 @@ const Profile = () => {
   const { id: encodedId } = useParams<{ id: string }>();
 
   const id = encodedId ? atob(encodedId) : "";
-  console.log(id);
+  // console.log(id);
 
   const currentUser = useUserContext();
   const [activeTab, setActiveTab] = useState("posts");
@@ -92,7 +92,7 @@ const Profile = () => {
 
   if (isUserLoading) {
     return (
-      <div className="flex-center w-full justify-center">
+      <div className="flex-center w-full justify-center h-screen">
         <Loader />
       </div>
     );
