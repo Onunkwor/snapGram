@@ -122,7 +122,7 @@ const PostDetails = () => {
           <div className="post_details-info">
             <div className="flex-between w-full">
               <Link
-                to={`/profile/${post?.creator._id}`}
+                to={`/profile/${btoa(post?.creator._id)}`}
                 className="flex items-center gap-3"
               >
                 <img
